@@ -98,3 +98,7 @@ __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 
 我们观察上面的代码,就会发现 `__webpack_modules__`中的`模块 1`接收到的 `exports` 就是`module.exports`的引用。
 `module.exports` 的赋值会将外部的 `module.exports` 赋值新内存地址为 `{a:0}` , 而`模块 1` 内部的 `exports` 重新赋值只是会给`模块 1` 的形参`exports`所指向的旧的内存地址赋值,所有没有任何意义,是错误的。
+
+### 如何理解 webpack 运行时代码最后是 `__webpack_require__(0)`?
+
+我们从上面的代码中得知 require 的模块会从`__webpack_modules__` 模块 1 开始,为什么呢? 因为如果从 模块 0 开始且没有引入其他模块的话,这时候其实是不需要有`__webpack_modules__` 的,但如果我们将 index.js 也当做一个模块呢,也就是`__webpack_modules__`的 模块 0,在进入 index.js 时相当于执行了`__webpack_require__(0)` 。所以入口函数 就是模块 0。
