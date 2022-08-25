@@ -293,4 +293,4 @@ ul li {
 }
 ```
 
-可以生成一个包含模块关系的依赖树,我们可以基于`babel`来实现一下这个功能。
+可以生成一个包含模块关系的依赖树,我们可以基于`babel`来实现一下这个功能: [getAstModules](./code/astExplorer.js)
