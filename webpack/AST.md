@@ -294,3 +294,7 @@ ul li {
 ```
 
 可以生成一个包含模块关系的依赖树,我们可以基于`babel`来实现一下这个功能: [getAstModules](./code/astExplorer.js)
+
+## 4. 接下来实现一个 mini-webpack !
+
+[mini-webpack](./code/mini-webpack.js)
