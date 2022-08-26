@@ -298,3 +298,10 @@ ul li {
 ## 4. 接下来实现一个 mini-webpack !
 
 [mini-webpack](./code/mini-webpack.js)
+
+## 5. 去除代码中的`console.log`
+
+![ConsoleLogAST](./assets/consoleAST.png)
+
+观察`console.log('1')`的在`@babel/parser`解析后的 AST,发现判断是否为`console.log()`的条件
+之后在 AST 中将对应的 AST 节点删除,最后将修改后的 AST 重新转成代码输出
