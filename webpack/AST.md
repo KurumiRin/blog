@@ -305,3 +305,4 @@ ul li {
 
 观察`console.log('1')`的在`@babel/parser`解析后的 AST,发现判断是否为`console.log()`的条件
 之后在 AST 中将对应的 AST 节点删除,最后将修改后的 AST 重新转成代码输出
+[removeConsole](./code/removeConsole.js)
