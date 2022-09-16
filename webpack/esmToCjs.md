@@ -32,6 +32,8 @@
 
 ### ESM 运行时代码分析:
 
+相比 commonjs,多出了不少代码:
+
 ```js
 (() => {
   // 使用getter定义exports的属性
@@ -71,4 +73,37 @@
     Object.defineProperty(exports, "__esModule", { value: true });
   };
 })();
+```
+
+webpack 运行时代码:
+
+```js
+// 源码
+const sum = (...args) => args.reduce((x, y) => x + y, 0);
+
+// 运行时代码:
+export default sum;
+export const name = "sum"(
+  // 运行时代码
+
+  // 该模块被 module_wrapper 包裹,和cjs一样
+  (__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+    // 标记该模块是一个 ESM 模块
+    __webpack_require__.r(__webpack_exports__);
+
+    // 导出所有的属性，即 __webpack_exports__，但通过 getter 方式，可以懒加载属性
+    __webpack_require__.d(__webpack_exports__, {
+      default: () => __WEBPACK_DEFAULT_EXPORT__,
+      name: () => /* binding */ name,
+    });
+
+    // 执行代码，配置 getter 的属性
+    const sum = (...args) => args.reduce((x, y) => x + y, 0);
+
+    // export default
+    const __WEBPACK_DEFAULT_EXPORT__ = sum;
+    // export const name
+    const name = "sum";
+  }
+);
 ```
