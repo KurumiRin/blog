@@ -88,7 +88,7 @@ $ stat -c "%F" /var/run/docker.sock
 socket
 ```
 
-还可以使用`ls -lah`查看文件类型,第一个字符标识文件类型。
+还可以使用`ls -lah(简写-l)`查看文件类型,第一个字符标识文件类型。
 
 - -，regular file。普通文件。
 - d，directory。目录文件。
