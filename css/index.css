@@ -1,0 +1,10 @@
+.number {
+  /* 可以使非等宽字体等宽 */
+  font-feature-settings:"tnum";
+  font-variant-numeric:tabular-nums;
+}
+
+.flex {
+  /* 可以使flex布局的盒子不会因为挤压而缩小 */
+  flex-shrink:0;
+}
