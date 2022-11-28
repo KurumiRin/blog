@@ -15,3 +15,11 @@ nuxt3 开发者说这个表现就是预期的,配置了 server:false 后服务�
 
 首先需要下载测试版本 HbuilderX，正式版内置 node 版本不支持
 然后根据https://ask.dcloud.net.cn/question/145281的解决方案操作
+
+### macos 安装的软件提示文件已损坏
+
+```bash
+sudo xattr -r -d com.apple.quarantine
+```
+
+将提示损坏的软件拖到这行命令的后面然后回车输入密码即可
