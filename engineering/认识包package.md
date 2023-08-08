@@ -120,3 +120,33 @@ $ npm install vue3@npm:vue@3
 
 `install size`，指 `npm i <pkg>` 时，你真正安装的 npm 包的体积，包含该 `<pkg>` 的所有依赖以及间接依赖（即递归 pkg 的 所有 dependencies 的总体积）。
 在 https://pkg-size.dev/ 网站中，可以看到某个依赖的所有间接依赖以及安装体积。
+
+## engines
+
+指定一个项目所需的 node 最小版本，属于一个项目的质量工程。
+对于版本不匹配要求报错(yarn)或警告(npm)，那我们需要在 `package.json` 中的 `engines` 字段中指定 Node 版本号
+
+```json
+{
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
+```
+
+如果本地 node 版本号为 `v10.24.1`，而项目所需版本号为 `>=16.0.0`。
+此时 npm 将会警告：
+
+```Bash
+npm WARN EBADENGINE Unsupported engine { package: 'next-app@1.0.0',
+npm WARN EBADENGINE   required: { node: '>=16.0.0' },
+npm WARN EBADENGINE   current: { node: 'v10.24.1', npm: '7.14.0' } }
+```
+
+yarn 将会报错：
+
+```Bash
+error next-app@1.0.0: The engine "node" is incompatible with this module. Expected version ">=16.0.0". Got "10.24.1"
+```
+
+在 yarn 中项目中某些依赖所需要的 Node 版本号与项目运行时的 Node 版本号不匹配，也会报错。
