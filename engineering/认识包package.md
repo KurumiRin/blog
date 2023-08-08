@@ -150,3 +150,128 @@ error next-app@1.0.0: The engine "node" is incompatible with this module. Expect
 ```
 
 在 yarn 中项目中某些依赖所需要的 Node 版本号与项目运行时的 Node 版本号不匹配，也会报错。
+
+## npm scripts
+
+`npm scripts` 是一种在 javascript 项目中定义脚本的简单方法，仅仅通过 `npm run <command>` 就可以运行对应脚本。它允许通过运行一些命令来自动化大部分常见任务，例如编译代码、运行测试、启动服务器等。它可以让开发者快速开发、构建和部署项目，也使得项目的配置变得更加简单和易于维护。
+
+`npm scripts` 通过 `package.json` 中的 `scripts` 字段进行配置，比如：
+
+```json
+{
+  "scripts": {
+    "dev": "next",
+    "start": "next start"
+  }
+}
+```
+
+在 `package.json` 默认的 scripts 有：
+
+- `install`：依赖安装
+- `start`：启动服务
+- `test`：测试项目
+  他们可以通过 `npm <command>` 直接运行，如 `npm install`、`npm start`。
+  除了默认的 scripts 外，还有一些约定俗成的脚本，比如：
+- `build`：构建打包
+- `dev`：开发环境
+- `lint`：格式化
+  对于此类自定义的 scripts 需要 `npm run <command>` 方可执行。
+
+### script
+
+在 `scripts` 中定义的实际上是命令行工具，因此需要对其有所熟悉，特别是 Linux 命令。
+即使大部分为简单的 node.js 所开发的命令行工具，如 `eslint`、`webpack`、`next` 等。但当命令稍显复杂时，仍然有部分 Linux 命令知识需要了解。
+
+### 环境变量
+
+环境变量，如 `NODE_ENV=production <command>` 是 `Linux` 中常见的配置环境变量的方式，在执行命令时读取环境变量 `NODE_ENV` 为 `production`。
+
+在 `windows` 系统中，无法通过此方式读取环境变量，因此需要借助工具 [cross-env](https://github.com/kentcdodds/cross-env) 实现跨平台式的环境变量配置，但是大部分项目均是在 mac/linux 中进行开发及部署，因此许多时候 `corss-env` 无用武之地。
+
+```JSON
+{
+  "scripts": {
+    "dev": "NODE_ENV=production webpack",
+
+    "dev:cross-platform": "cross-env NODE_ENV=production webpack"
+  },
+}
+```
+
+### pre/post script
+
+`npm scripts` 有一些好用的钩子，可以辅助提高我们的工作效率。
+使用场景：
+
+1. 在 `npm publish` 发包之前忘记 `npm run build`，导致发包无效
+2. 在 `npm start` 启动服务之前需要执行某命令以进行配置数据，但每次都需要记得执行命令，很是繁琐
+
+#### pre/post
+
+`npm scripts` 有两个最为重要的钩子，即 `pre/post`，这些钩子允许我们在 `npm script` 执行前后自动执行自定义脚本，可以用于执行一些预处理或后处理任务。
+当我们在手动执行 `npm run xxx` 时，若果 `prexxx` 及 `postxxx` 在 `scripts` 存在时，它将会自动执行 `npm run prexxx` 以及 `npm run postxxx`。
+
+```json
+{
+  "scripts": {
+    "prelint": "echo 'Preparing to lint...'",
+    "lint": "eslint",
+    "postlint": "echo 'liting complete.'"
+  }
+}
+```
+
+上面的示例在执行 `npm run lint` 时：
+
+```bash
+$ npm run lint
+
+> next-app@1.0.0 prelint
+> echo 'Preparing to lint...'
+
+Preparing to lint...
+
+> next-app@1.0.0 lint
+> eslint
+
+......
+
+> next-app@1.0.0 postlint
+> echo 'liting complete.'
+
+liting complete.
+```
+
+> 注意：`pnpm` 默认不会执行 `pre/post` 钩子，需要配置 `enable-pre-post-scripts` 为 true
+
+#### lifecycle script
+
+除了 `pre/post` 外，`npm publish` 还有复杂的生命周期。如：
+
+- `npm run prepare`
+- [`npm pack`](https://docs.npmjs.com/cli/v9/commands/npm-pack)
+- [`npm publish`](https://docs.npmjs.com/cli/v9/commands/npm-publish)
+
+##### prepare
+
+`prepare` 将自动发生在以下两个阶段：
+
+- `npm install` 之后自动执行，因此有时 `prepare` 会代替 `postinstall` 的功能
+- `npm publish` 之前自动执行
+
+##### pack
+
+`npm pack` 将当前 npm 包的内容进行压缩打包为 `tarball`，这也是实际上传到 npm 仓库的内容。
+在我们 `npm publish` 发包之前，会自动执行 `npm pack` 压缩打包。在 `npm pack` 时，会自动计算出 `integrity` 等信息，方便 `npm i` 时进行完整性校验。
+
+##### publish
+
+`npm publish` 将本地的 npm 包进行 `npm pack` 打包，并上传到 npm 仓库。以下就是 `publish` 相关的钩子，其中最为重要的是 `prepublishOnly` 与 `prepare`。见 [`npm publish`](https://docs.npmjs.com/cli/v8/using-npm/scripts#npm-publish)
+
+- prepublishOnly
+- prepack
+- prepare
+- postpack
+- publish
+- postpublish
