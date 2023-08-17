@@ -275,3 +275,53 @@ liting complete.
 - postpack
 - publish
 - postpublish
+
+### lockfile
+
+当 `npm i` 时，默认的版本号是 `^` ，能最大限度地在向后兼容与新特性之间做取舍。但是有些库有可能不遵循该规则，所以在项目中应当使用 `yarn.lock/package-lock.json` 锁定版本号。
+
+`package-lock` 的工作流程：
+
+1. `npm i webpack`，此时下载最新 webpack 版本 `5.58.2`，在 `package.json` 中显示为 `webpack: ^5.58.2`，版本号范围是 `>=5.58.2 < 6.0.0`
+2. 在 `package-lock.json` 中全局搜索 `webpack`，发现 webpack 的版本是被锁定的，也是说它是确定的 `webpack: 5.58.2`。
+3. 经过一个月后，webpack 最新版本为 `5.100.0`，但由于 `webpack` 版本在 `package-lock.json` 中锁死，每次上线时仍然下载 `5.58.2` 版本号。
+4. 经过一年后，webpack 最新版本为 `6.0.0`，但由于 `webpack` 版本在 `package-lock.json` 中锁死，且 `package.json` 中 `webpack` 版本号为 `^5.58.2`，与 `package-lock.json` 中为一致的版本范围。每次上线时仍然下载 `5.58.2` 版本号。
+5. 或者：经过一年后，webpack 最新版本为 `6.0.0`，需要进行升级，此时手动改写 `package.json` 中 `webpack` 版本号为 `^6.0.0`，与 `package-lock.json` 中不是一致的版本范围。此时 `npm i` 将下载 `6.0.0` 最新版本号，并重写 `package-lock.json` 中锁定的版本号为 `6.0.0` 。
+
+存在问题的流程：
+
+1. `pkg 1.2.3`: 首次在开发环境安装 pkg 库，为此时最新版本 `1.2.3`，`dependencies` 依赖中显示 `^1.2.3`，实际安装版本为 `1.2.3`
+2. `pkg 1.19.0`: 在生产环境中上线项目，安装 pkg 库，此时最新版本为 `1.19.0`，满足 `dependencies` 中依赖 `^1.2.3` 范围，实际安装版本为 `1.19.0`，但是 pkg 未遵从 semver 规范，在此过程中引入了 Breaking Change，如何此时 `1.19.0` 有问题的话，那生产环境中的 `1.19.0` 将会导致 bug，且难以调试。
+
+总结：
+当 `package-lock.json` 该 package 锁死的版本号符合 `package.json` 中的版本号范围时，将以 `package-lock.json` 锁死版本号为主。
+当 `package-lock.json` 该 package 锁死的版本号不符合 `package.json` 中的版本号范围时，将会安装该 package 符合 `package.json` 版本号范围的最新版本号，并重写 `package-lock.json`
+
+### sideeffects 副作用
+
+`sideEffects` 用于指示 npm 包是否具有副作用。副作用是指模块在 `import` 时会执行一些副作用操作，比如修改全局变量、写文件等。
+
+在 `package.json` 中，我们可以通过以下方式配置 `sideEffects`：
+
+```json
+{
+  "name": "redux",
+  "version": "5.0.0-beta.0",
+  "sideEffects": false
+}
+```
+
+在社区中，诸多流行的 npm 包都标注了 sideEffects 该字段，如：
+
+- [redux](https://github.com/reduxjs/redux/blob/master/package.json)
+- [rxjs](https://github.com/ReactiveX/rxjs/blob/master/package.json)
+- [mobx](https://github.com/mobxjs/mobx/blob/main/packages/mobx/package.json)
+
+当 `sideEffects:false` 时，这将触发 webpack 等打包器的 `Tree Shaking` 优化，它会安全地**删除未使用的模块，减小最终打包体积**。然而，有时虽然大部分模块无副作用，但仍然存在一些特定的模块具有副作用。在这种情况下，可以将 `sideEffects` 设置为一个数组，指定具有副作用的模块列表。
+
+```json
+{
+  "name": "your-project",
+  "sideEffects": ["./src/some-side-effectful-file.js", "*.css"]
+}
+```
