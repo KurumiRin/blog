@@ -23,3 +23,7 @@ sudo xattr -r -d com.apple.quarantine
 ```
 
 将提示损坏的软件拖到这行命令的后面然后回车输入密码即可
+
+### macos中安装BattleNet(战网)时，进度卡在45%的解决方案
+
+默认下载到download目录下并解压，之后命令行输入 `open -a ~/Downloads/Battle.net-Setup.app --args --locale=enUS --region=US --session=`
